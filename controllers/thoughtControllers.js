@@ -11,7 +11,7 @@ module.exports = {
   // Get a single thought by _Id
   getSingleThought(req, res) {
     Thought.findOne({ _id: req.params.thoughtId })
-      .select("-__v")
+      .populate({ path: "users", select: '-__v' })
       .then(async (thought) =>
         !thought
           ? res
@@ -94,7 +94,7 @@ module.exports = {
     console.log(req.body);
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $addToSet: { reactions: req.body } },
+      { $addToSet: { reactionBody: req.body } },
       { runValidators: true, new: true }
     )
       .then((thought) =>
@@ -110,7 +110,7 @@ module.exports = {
   deleteReaction(req, res) {
     Thought.findOneAndUpdate(
       { _id: req.params.thoughtId },
-      { $pull: { reactions: { reactionId: req.params.reactionId } } },
+      { $pull: { reactions: req.params.reactionId } },
       { runValidators: true, new: true }
     )
       .then((thought) =>
